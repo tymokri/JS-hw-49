@@ -1,6 +1,11 @@
 class View {
     #todoContainer = null;
     #form = null;
+    #key = null;
+
+    constructor({key}) {
+        this.#key = key;
+    }
 
 
     renderItem({title, description, id}) {
@@ -19,13 +24,13 @@ class View {
 
 
     setTodosContainer(htmlElement) {
-        if(this.#todoContainer) throw new Error('You cannot redeclare todo container'); // щоб не засетити повторно html елемент
+        if(this.#todoContainer) throw new Error('You cannot redeclare todo container');
         this.#todoContainer = htmlElement;
     }
 
 
     setForm(htmlElement) {
-        if(this.#todoContainer) throw new Error('You cannot redeclare form'); // щоб не засетити повторно html елемент
+        if(this.#todoContainer) throw new Error('You cannot redeclare form');
         this.#form = htmlElement;
     }
 
@@ -33,4 +38,19 @@ class View {
         alert(errorMessage);
     }
 
+    deleteTodoItem(htmlElement) {
+        htmlElement.addEventListener('click', e => {
+            e.stopPropagation();
+
+            const currentItem = e.target.closest('[data-id]');
+            const currentItemId = Number(currentItem.getAttribute('data-id'));
+
+            const filteredData = JSON
+                .parse(localStorage.getItem(this.#key))
+                .filter(item => item.id !== currentItemId);
+            localStorage.setItem(this.#key, JSON.stringify(filteredData));
+            currentItem.remove();
+            if (filteredData.length === 0) localStorage.clear();
+        });
+    }
 }
